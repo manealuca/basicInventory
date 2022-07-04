@@ -1,0 +1,63 @@
+﻿@using Entitys
+@using Business
+
+<hr/>
+    <select class="form-control" @onchange="CategoryChanged">
+        <option value="">Seleccione Categoria...</option>
+    @foreach(var categorie in categories)
+    {
+        <option value="@categorie.CategoryId">@categorie.CategoryName</option>
+    }
+</select>
+<hr/>
+<table class="table table-hover table-bordered">
+    <thead>
+        <tr>
+            <th>Referencia</th>
+            <th>Nombre Producto</th>
+            <th>Categoria</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var categorie in categories)
+        {
+            <tr>
+                <td>@categorie.CategoryId</td>
+                <td>@categorie.CategoryName</td>
+                <td><a href="category/update/@categorie.CategoryId">Editar</a></td>
+            </tr>
+        }
+    </tbody>
+</table>
+        
+@code {
+    public List<CategoryEntity> categories = new List<CategoryEntity>();
+    public List<CategoryEntity> tCategories = new List<CategoryEntity>();
+    protected override async Task OnInitializedAsync()
+    {
+        categories = B_Category.categoryList();
+        tCategories = categories;
+    }
+    public void CategoryChanged(ChangeEventArgs e)
+    {
+        //message = e.Value.ToString();
+        if (e.Value.ToString() == "") tCategories = categories;
+        else
+        {
+            try
+            {
+                string id = e.Value.ToString();
+                tCategories = (from categorie in categories
+                              where categorie.CategoryId == id
+                              select categorie).OrderBy(c => c.CategoryName)
+                                            .ToList(); 
+                //tProducts = products.Where(c => c.Category.ToString() == e.Value.ToString()).ToList();            
+            }catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }    
+        }
+    }
+
+}

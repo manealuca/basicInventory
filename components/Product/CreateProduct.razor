@@ -1,0 +1,57 @@
+﻿@using Entitys
+@using Business
+
+@inject NavigationManager NavManager
+
+<div>
+    <EditForm Model="oPrudct">
+        <div class="form-control">
+            <label>Referencia:</label>
+            <InputText @bind-Value="oPrudct.ProductId" class="form-group"></InputText>
+        </div>
+          <div class="form-control">
+            <label>Nombre de Producto:</label>
+            <InputText @bind-Value="oPrudct.ProductName" class="form-group"></InputText>
+        </div>
+         <div class="form-control">
+            <label>Descripcion:</label>
+            <InputTextArea @bind-Value="oPrudct.ProductDescription" class="form-control"></InputTextArea>
+        </div>
+        <div class="form-group">
+            <label>Categoria:</label>
+            <InputSelect @bind-Value="oPrudct.CategoryId">
+                <option value="">SeleccioneCategoria...</option>
+                @foreach(var category in oCategories)
+                {
+                    
+                    <option value="@category.CategoryId" class="form-control">@category.CategoryName</option>
+                }
+            </InputSelect>
+        </div>
+        <input type="button" value="Agregar Producto" @onclick="SaveProduct"></input>
+
+    </EditForm>
+
+</div>
+@code {
+    public ProductEntity oPrudct = new ProductEntity();
+    public List<CategoryEntity> oCategories = new List<CategoryEntity>();
+    protected override async Task OnInitializedAsync()
+    {    
+        oCategories = B_Category.categoryList();
+    }
+    public void SaveProduct()
+    {
+        try
+        {
+            Console.WriteLine(oPrudct.CategoryId);
+            B_Product.createProduct(oPrudct);
+            NavManager.NavigateTo("product/list");
+        }catch(Exception ex)
+        {
+            Console.WriteLine("Error al agregar el producto "+ex.Message);
+        }
+
+    
+    }
+}

@@ -1,0 +1,69 @@
+﻿@using Entitys
+@using Business
+
+@inject NavigationManager NavManager
+<EditForm Model="oStorage">
+    <div class="form-group">
+        <label>Bodega:</label>
+        <InputSelect @bind-Value="oStorage.WharehouseId" class="form-control">
+            <option value="">Seleccione una Almacen...</option>
+            @foreach(var wareHouse in whareHouses)
+            {
+                <option value="@wareHouse.WhareHouseId">@wareHouse.WhareHouseName</option>
+            }
+        </InputSelect>        
+    </div>
+    <div class="form-group">
+        <label>Productos:</label>
+        <InputSelect @bind-Value="oStorage.ProductId" class="form-control">
+            <option value="">Seleccione un Producto...</option>
+            @foreach(var product in products)
+            {
+                <option value="@product.ProductId">@product.ProductName</option>
+            }
+        </InputSelect>
+    </div>
+    <input type="button" value="Almacenar Producto" @onclick="SaveStorage"/>
+    <div class="text-center h4">
+        @message
+    </div>
+</EditForm>
+
+@code{
+    StorageEntity oStorage = new StorageEntity();
+    List<WhareHouseEntity> whareHouses = new List<WhareHouseEntity>();
+
+    List <ProductEntity> products = new List<ProductEntity>();
+    string message = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        whareHouses = B_WhareHouse.WhareHouseList();
+        products = B_Product.ProductList();
+    }
+
+    private void SaveStorage()
+    {
+        try
+        {
+            oStorage.StorageId = $"{oStorage.WharehouseId}-{oStorage.ProductId}";
+            if (!B_Storage.IsProductInWhareHouse(oStorage.StorageId))
+            {
+                oStorage.LastUpdate = DateTime.Now;
+                oStorage.StorageName = "";
+                oStorage.PartialQuantity = 0;
+                B_Storage.createStorage(oStorage);
+                message = "Producto Almacenado correctamente";
+                NavManager.NavigateTo("storage/list");
+            }
+            else
+            {
+                message = "El producto ya Esta cargado en esta Bodega";
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }   
+    }
+}

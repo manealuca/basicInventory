@@ -1,0 +1,70 @@
+﻿@using Entitys
+@using Business
+
+
+<hr/>
+    <select class="form-control" @onchange="CategoryChanged">
+        <option value="">Seleccione Categoria...</option>
+    @foreach(var categorie in categories)
+    {
+        <option value="@categorie.CategoryId">@categorie.CategoryName</option>
+    }
+</select>
+<hr/>
+<table class="table table-hover table-bordered">
+    <thead>
+        <tr>
+            <th>Referencia</th>
+            <th>Nombre Producto</th>
+            <th>Categoria</th>
+            <th>Cantidad</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var product in tProducts)
+        {
+            <tr>
+                <td>@product.ProductId</td>
+                <td>@product.ProductName</td>
+                <td>@product.CategoryId</td>
+                <td>@product.TotaltQuantity</td>
+                <td><a href="product/update/@product.ProductId">Editar</a></td>
+            </tr>
+        }
+    </tbody>
+</table>
+        
+@code {
+
+    public List<ProductEntity> products = new List<ProductEntity>();
+    public List<ProductEntity> tProducts = new List<ProductEntity>();
+    public List<CategoryEntity> categories = new List<CategoryEntity>();
+    protected override async Task OnInitializedAsync()
+    {
+        products = B_Product.ProductList();
+        tProducts = products;
+        categories = B_Category.categoryList();
+    }
+    public void CategoryChanged(ChangeEventArgs e)
+    {
+        //message = e.Value.ToString();
+        if (e.Value.ToString() == "") tProducts = products;
+        else
+        {
+            try
+            {
+                string id = e.Value.ToString();
+                tProducts = (from product in products
+                              where product.CategoryId == id
+                              select product).OrderBy(p => p.ProductName)
+                                            .ToList(); 
+                //tProducts = products.Where(c => c.Category.ToString() == e.Value.ToString()).ToList();            
+            }catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }    
+        }
+    }
+
+}

@@ -1,0 +1,38 @@
+﻿@using Entitys
+@using Business
+
+@inject NavigationManager NavManager
+
+<div>
+    <EditForm Model="oWhareHouse">
+        <div class="form-control">
+            <label>Referencia:</label>
+            <InputText @bind-Value="oWhareHouse.WhareHouseId" class="form-group"></InputText>
+        </div>
+          <div class="form-control">
+            <label>Nombre Almacen:</label>
+            <InputText @bind-Value="oWhareHouse.WhareHouseName" class="form-group"></InputText>
+        </div>
+         <div class="form-control">
+            <label>Direccion:</label>
+            <InputTextArea @bind-Value="oWhareHouse.WhareHouseAddress" class="form-control"></InputTextArea>
+        </div>
+        <input type="button" value="Agregar Producto" @onclick="SaveWhareHouse"></input>
+
+    </EditForm>
+
+</div>
+@code {
+    WhareHouseEntity oWhareHouse = new WhareHouseEntity();
+    public void SaveWhareHouse()
+    {
+        try
+        {
+            B_WhareHouse.createWhareHouse(oWhareHouse);
+            NavManager.NavigateTo("wharehouse/list");
+        }catch(Exception ex)
+        {
+            Console.WriteLine("Error al agregar el producto "+ex.Message);
+        }
+    }
+}
